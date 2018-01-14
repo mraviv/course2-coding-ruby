@@ -1,1 +1,15 @@
 # assignment 3 solution
+
+namespace :rename_yml do
+  desc "rename *.yaml fine to *.yml"
+  task :files, [:path] do |t, args|
+    if args[:path]
+      Dir.chdir args[:path]
+      puts "operating on #{args[:path]}"
+    end
+    my_files = FileList["*.yaml"]
+    my_files.each do |f|
+     sh "mv #{f} #{f.split(".yaml")[0]}.yml"
+    end
+  end
+end

@@ -1,1 +1,33 @@
 # assignment 4 solution
+
+require "open3"
+
+desc "Archive files in a specific path"
+task :archive do
+  if ENV["MY_PATH"]
+    my_path = ENV["MY_PATH"]
+    Dir.chdir my_path
+  else
+    stdout, stderr, status = Open3.capture3("pwd")
+    my_path = stdout.strip
+  end
+  puts "Archiving #{my_path}"
+
+  my_files = FileList["*"]
+
+  if ENV["EXCLUDE"]
+    exclude_list = ENV["EXCLUDE"].split(",")
+    exclude_list.each do |t|
+      my_files = my_files.exclude("*#{t}")
+      puts "Eexcluding *#{t} files"
+    end
+    my_files = my_files.exclude("build")
+  else
+    puts "All included"
+  end
+
+  name = my_path.split("/")[-1].gsub(/\s/,"_")
+  Dir.mkdir("build") unless Dir.exists?("build")
+  sh "tar -zcvf build/#{name}.tar.gz #{my_files}"
+end
+
